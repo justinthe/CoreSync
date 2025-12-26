@@ -96,12 +96,10 @@ POSTGRES_PORT=5432
 # Get API Key: [https://platform.deepseek.com/](https://platform.deepseek.com/)
 DEEPSEEK_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxx
 
-# --- WHATSAPP (META) ---
-# Get these from Meta Developer Dashboard -> WhatsApp -> API Setup
-WHATSAPP_TOKEN=EABWxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-WHATSAPP_PHONE_ID=10xxxxxxxxxxxxx
-# This is a password you invent yourself for the webhook verification
-VERIFY_TOKEN=my_secret_password_123
+# --- TWILIO ---
+TWILIO_PHONE_NUMBER=whatsapp:+14155238886
+TWILIO_ACCOUNT_SID=xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 # --- GOOGLE CALENDAR ---
 # Do not change the path (it maps to the docker container)

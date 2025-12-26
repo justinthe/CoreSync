@@ -38,14 +38,28 @@ def create_calendar_event(booking):
     Creates an event in Google Calendar.
     Returns the Google Event ID.
     """
-    try:
-        service = get_calendar_service()
-        calendar_id = os.environ.get("CALENDAR_ID", "primary")
+    service = get_calendar_service()
+    if not service:
+        return None
 
-        # Define the event body
+    calendar_id = os.environ.get("CALENDAR_ID")
+    
+    # --- NEW NAME LOGIC ---
+    # Check if we have a name in the database
+    c = booking.customer
+    if c.first_name:
+        # If last name exists, add it too. Example: "Pilates: John Doe"
+        full_name = f"{c.first_name} {c.last_name or ''}".strip()
+        event_summary = f"Pilates: {full_name}"
+    else:
+        # Fallback if no name found. Example: "Pilates: +62812345678"
+        event_summary = f"Pilates: {c.phone_number}"
+    # ----------------------
+
+    try:
         event_body = {
-            'summary': f"Pilates: {booking.customer.first_name or 'Client'} {booking.customer.phone_number}",
-            'description': f"Booking via CoreSync.\nPhone: {booking.customer.phone_number}",
+            'summary': event_summary,
+            'description': f"Booking via CoreSync.\nPhone: {c.phone_number}",
             'start': {
                 'dateTime': booking.start_time.isoformat(),
                 'timeZone': settings.TIME_ZONE,
@@ -56,7 +70,9 @@ def create_calendar_event(booking):
             },
         }
 
+        print(f"DEBUG: Inserting event '{event_summary}'...")
         event = service.events().insert(calendarId=calendar_id, body=event_body).execute()
+        
         return event.get('id')
     
     except Exception as e:

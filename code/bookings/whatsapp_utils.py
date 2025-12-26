@@ -1,31 +1,39 @@
-import requests
 import os
-import json
+from twilio.rest import Client
 
 def send_whatsapp_message(to_phone_number, message_text):
     """
-    Sends a text message back to the user via Meta Cloud API.
+    Sends a WhatsApp message using Twilio.
+    Ensures both 'from' and 'to' numbers have the 'whatsapp:' prefix.
     """
-    # Meta requires the phone number ID, not your personal number
-    phone_id = os.environ.get("WHATSAPP_PHONE_ID")
-    token = os.environ.get("WHATSAPP_TOKEN")
+    account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
+    auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
     
-    url = f"https://graph.facebook.com/v17.0/{phone_id}/messages"
-    
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
-    
-    data = {
-        "messaging_product": "whatsapp",
-        "to": to_phone_number,
-        "type": "text",
-        "text": {"body": message_text}
-    }
-    
+    # Get the raw number from .env
+    raw_from = os.environ.get("TWILIO_PHONE_NUMBER")
+
+    client = Client(account_sid, auth_token)
+
+    # FORCE 'whatsapp:' prefix on the SENDER
+    if not raw_from.startswith("whatsapp:"):
+        from_number = f"whatsapp:{raw_from}"
+    else:
+        from_number = raw_from
+
+    # FORCE 'whatsapp:' prefix on the RECEIVER
+    if not to_phone_number.startswith("whatsapp:"):
+        to_number = f"whatsapp:{to_phone_number}"
+    else:
+        to_number = to_phone_number
+
+    print(f"DEBUG: Attempting to send from '{from_number}' to '{to_number}'")
+
     try:
-        response = requests.post(url, headers=headers, json=data)
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        print(f"Error sending WhatsApp: {e}")
+        message = client.messages.create(
+            from_=from_number,
+            body=message_text,
+            to=to_number
+        )
+        print(f"Twilio Message Sent: {message.sid}")
+    except Exception as e:
+        print(f"Error sending Twilio message: {e}")

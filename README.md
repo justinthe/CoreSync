@@ -8,6 +8,7 @@ CoreSync is an AI-powered booking management system designed for Pilates studios
 * **Google Calendar Sync:** Automatically pushes confirmed bookings to the studio's calendar.
 * **Conflict Prevention:** Handles double-booking and "ambiguous cancellation" scenarios safely.
 
+Cici punya
 ---
 
 ## 🚀 How to Run
